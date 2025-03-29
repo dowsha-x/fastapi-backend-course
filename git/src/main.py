@@ -1,26 +1,29 @@
+from pathlib import Path
 import json
-import os
+from typing import List, Dict, Any
 
 
-def load_books(filename="library.json"):
+def load_books(filename: str = "library.json") -> List[Dict[str, Any]]:
     """
     Загрузка списка книг из JSON-файла.
     Возвращает список книг (каждая книга - это словарь).
     """
-    if not os.path.isfile(filename):
+    if not Path(filename).is_file():
         return []
-    with open(filename, encoding="utf-8") as file:
+    with Path(filename).open(encoding="utf-8") as file:
         try:
             return json.load(file)
         except json.JSONDecodeError:
             return []
 
-def save_books(books, filename="library.json") -> None:
+
+def save_books(books: List[Dict[str, Any]], filename: str = "library.json") -> None:
     """Сохранение списка книг в JSON-файл."""
-    with open(filename, "w", encoding="utf-8") as file:
+    with Path(filename).open("w", encoding="utf-8") as file:
         json.dump(books, file, ensure_ascii=False, indent=4)
 
-def list_books(books):
+
+def list_books(books: List[Dict[str, Any]]) -> str:
     """Возвращает строку со списком всех книг."""
     if not books:
         return "Библиотека пуста."
@@ -29,7 +32,13 @@ def list_books(books):
         result_lines.append(f"{idx}. {book['title']} | {book['author']} | {book['year']}")
     return "\n".join(result_lines)
 
-def add_book(books, title, author, year):
+
+def add_book(
+    books: List[Dict[str, Any]],
+    title: str,
+    author: str,
+    year: str
+) -> List[Dict[str, Any]]:
     """
     Принимает текущий список книг и данные о новой книге.
     Возвращает новый список, в котором добавлена новая книга.
@@ -37,20 +46,26 @@ def add_book(books, title, author, year):
     new_book = {
         "title": title,
         "author": author,
-        "year": year,
+        "year": year
     }
-    # Создаём НОВЫЙ список, добавляя new_book
     return [*books, new_book]
 
-def remove_book(books, title):
+
+def remove_book(
+    books: List[Dict[str, Any]], 
+    title: str
+) -> List[Dict[str, Any]]:
     """
     Принимает текущий список книг и название книги для удаления.
     Возвращает новый список без книги, у которой совпадает название.
     """
-    # Фильтруем список: оставляем только те книги, у которых название не совпадает с переданным
     return [book for book in books if book["title"].lower() != title.lower()]
 
-def search_books(books, keyword):
+
+def search_books(
+    books: List[Dict[str, Any]], 
+    keyword: str
+) -> List[Dict[str, Any]]:
     """
     Поиск книг по ключевому слову (ищется в названии и авторе).
     Возвращает отфильтрованный список.
@@ -60,6 +75,7 @@ def search_books(books, keyword):
         book for book in books
         if keyword_lower in book["title"].lower() or keyword_lower in book["author"].lower()
     ]
+
 
 def main() -> None:
     """
@@ -126,5 +142,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-

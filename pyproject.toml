@@ -1,6 +1,18 @@
 [tool.ruff]
+line-length = 120
+target-version = "py311"
+
 select = [
-    "E", "F", "B", "D", "I", 
-    "N", "UP", "ANN", "S", "RUF"
+    "E",
+    "F",
+    "B",
+    "D",
+    "I",
+    "N",
+    "UP",
+    "ANN",
+    "S",
+    "RUF",
 ]
+
 ignore = ["E501"]

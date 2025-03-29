@@ -11,4 +11,4 @@ jobs:
       with:
         python-version: "3.11"
     - run: pip install ruff
-    - run: ruff check git/src/main.py --select F,B,E9,ANN,PTH,RUF --exit-zero
+    - run: ruff check git/src/main.py

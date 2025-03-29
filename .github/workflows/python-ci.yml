@@ -2,14 +2,14 @@ name: Простой CI
 
 on:
   push:
+    branches: [main]
     paths:
       - 'git/src/main.py'
   pull_request:
-    paths:
-      - 'git/src/main.py'
+    branches: [main]
 
 jobs:
-  ruff-check:
+  lint:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -20,7 +20,15 @@ jobs:
         python-version: "3.11"
     
     - name: Install Ruff
-      run: pip install ruff
+      run: pip install ruff==0.4.7
     
-    - name: Run Ruff on main.py
-      run: ruff check git/src/main.py --show-source --statistics
+    - name: Run Ruff linting
+      run: |
+        echo "=== Strict Mode ==="
+        ruff check git/src/main.py --select ALL --ignore E501
+        
+        echo "=== Attempt Auto-Fixes ==="
+        ruff check git/src/main.py --fix --exit-zero
+        
+        echo "=== Statistics ==="
+        ruff check git/src/main.py --statistics

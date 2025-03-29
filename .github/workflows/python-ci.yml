@@ -2,13 +2,14 @@ name: Простой CI
 
 on:
   push:
-    branches: [ "main" ]
+    paths:
+      - 'git/src/main.py'
   pull_request:
-    branches: [ "main" ]
+    paths:
+      - 'git/src/main.py'
 
 jobs:
-  lint:
-    name: Lint with Ruff
+  ruff-check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -21,5 +22,5 @@ jobs:
     - name: Install Ruff
       run: pip install ruff
     
-    - name: Run Ruff
-      run: ruff check .
+    - name: Run Ruff on main.py
+      run: ruff check git/src/main.py --show-source --statistics

@@ -1,26 +1,13 @@
-import os
-
 import requests
-from dotenv import load_dotenv
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-load_dotenv()
+from constans import (url, headers, headers_type,
+                      API_BASE_URL, LLM_MODEL, HEADERS_AI)
 
-api_key = os.getenv("API_KEY")
 
 app = FastAPI()
-
-url = 'https://api.jsonbin.io/v3/b/'
-
-headers = {
-    "X-Master-Key": api_key
-}
-
-headers_type = {
-  'Content-Type': 'application/json',
-  'X-Master-Key': api_key
-}
 
 
 class Task(BaseModel):
@@ -41,12 +28,38 @@ def get_tasks(task_id: str):
     )
 
 
+def run_llm(model: str, task_text: str) -> str:
+    inputs = [
+        { "role": "system", "content": "Ты — дружелюбный помощник, который объясняет, как решать задачи." },
+        { "role": "user", "content": f"Объясни, как решить задачу на русском языке: {task_text}" }
+    ]
+    input_payload = {"messages": inputs}
+    response = requests.post(
+        f"{API_BASE_URL}{model}",
+        headers=HEADERS_AI,
+        json=input_payload
+    )
+    if response.status_code == 200:
+        return response.json()["result"]["response"]
+    else:
+        raise Exception(
+            f"Ошибка LLM: {response.status_code} - {response.text}"
+        )
+
+
 @app.post("/tasks")
 def create_task(task: Task):
+    try:
+        explanation = run_llm(LLM_MODEL, task.title)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка LLM: {str(e)}")
+
     data = {
         "title": task.title,
-        "status": task.status
+        "status": task.status,
+        "explanation": explanation
     }
+
     response = requests.post(url, json=data, headers=headers_type)
 
     if response.status_code == 200:

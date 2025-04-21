@@ -147,3 +147,4 @@ def update_task(task_id: str, task: Task):
 @app.delete("/tasks/{task_id}")
 def delete_task(task_id: str):
     return json_bin_client.delete(task_id)
+
